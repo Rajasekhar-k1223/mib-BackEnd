@@ -34,20 +34,20 @@ return [
     */
 
     'connections' => [
-// 'mongodb' => [
-//          'driver'   => 'mongodb',
-//          'host'     => env('MONGO_DB_HOST', 'localhost'),
-//          'port'     => env('MONGO_DB_PORT', 7391),
-//          'database' => env('MONGO_DB_DATABASE','Mibook1'),
-//          'username' => env('MONGO_DB_USERNAME',''),
-//          'password' => env('MONGO_DB_PASSWORD',''),
-//          'options'  => []
-//      ], 
 'mongodb' => [
-        'driver' => 'mongodb',
-        'dsn' => env('DB_URI', 'mongodb+srv://elsea:jYtfuNjlWJ3pmUN7@cluster0.tfmm5.mongodb.net/Mibook?retryWrites=true&w=majority'),
-        'database' => 'Mibook',
-],
+         'driver'   => 'mongodb',
+         'host'     => env('MONGO_DB_HOST', '3.136.238.122'),
+         'port'     => env('MONGO_DB_PORT', 27017),
+         'database' => env('MONGO_DB_DATABASE','Mibook'),
+         'username' => env('MONGO_DB_USERNAME',''),
+         'password' => env('MONGO_DB_PASSWORD',''),
+         'options'  => []
+     ], 
+// 'mongodb' => [
+//         'driver' => 'mongodb',
+//         'dsn' => env('DB_URI', 'mongodb+srv://elsea:jYtfuNjlWJ3pmUN7@cluster0.tfmm5.mongodb.net/Mibook?retryWrites=true&w=majority'),
+//         'database' => 'Mibook',
+// ],
         'sqlite' => [
             'driver' => 'sqlite',
             'url' => env('DATABASE_URL'),

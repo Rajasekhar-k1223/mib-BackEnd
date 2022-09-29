@@ -32,12 +32,14 @@ class feedsController extends Controller
                 $extension = $file->extension();
                 $type = $file->getMimeType();
                 list($width, $height) = getimagesize($file);
-                $path = $file->storeAs('images',$storename);
+               // $path = $file->storeAs('images',$storename);
                 //$img = file_get_contents($file->move(public_path('files'), $name));  
                 //$data = "data:@file/" . $file->extension() . ";base64,".base64_encode($img);
                 //$data = 'data:'.$type.';base64,'.base64_encode($img);
-                $storagepath =  env('APP_URL').':8000/storage/images';
-                $newItem = array('uri'=>$name,'type'=>$type,'path'=>$storagepath,'width'=>$width,'height'=>$height);
+               // $storagepath =  env('APP_URL').':8000/storage/images';
+                 $path = Storage::disk('s3')->put('images', $storename);
+        $path = Storage::disk('s3')->url($path);
+                $newItem = array('uri'=>$name,'type'=>$type,'path'=>$path,'width'=>$width,'height'=>$height);
                  array_push($files,$newItem);
             }
          }
