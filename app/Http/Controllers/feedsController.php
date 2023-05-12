@@ -8,21 +8,23 @@ use App\Models\Likes;
 //use App\Http\Controllers\VideoStream;
 use App\Http\Helpers\VideoStream;
 //use App\Models\File;
+// use Illuminate\Support\Facades\Storage;
 class feedsController extends Controller
 {
     //
     public function getAll(Request $request){
          $UserDate = feeds::offset($request->page)->limit($request->SetLimit)->orderBy('feedId','DESC')->get();
-         
+       //  exec('D:\mibook\mib\mib-api\python_file\mail.py');
         return response()->json(['status' => 'Success','code'=>200,'data' => $UserDate]);
         
     }
     public function createFeed(Request $request){
          $files = [];
          //print_r($request->hasfile('filenames'));
+         
         if($request->file('uploadImage'))
          {
-             
+           
             foreach($request->file('uploadImage') as $file)
             {
                 // return $file;
@@ -32,14 +34,23 @@ class feedsController extends Controller
                 $extension = $file->extension();
                 $type = $file->getMimeType();
                 list($width, $height) = getimagesize($file);
-               // $path = $file->storeAs('images',$storename);
+                $path = $file->storeAs('images',$storename,'public');
                 //$img = file_get_contents($file->move(public_path('files'), $name));  
                 //$data = "data:@file/" . $file->extension() . ";base64,".base64_encode($img);
                 //$data = 'data:'.$type.';base64,'.base64_encode($img);
                // $storagepath =  env('APP_URL').':8000/storage/images';
-                 $path = Storage::disk('s3')->put('images', $storename);
-        $path = Storage::disk('s3')->url($path);
-                $newItem = array('uri'=>$name,'type'=>$type,'path'=>$path,'width'=>$width,'height'=>$height);
+               # If you set S3 as your default:
+// $contents = Storage::get('path/to/file.ext');
+// Storage::put('path/to/file.ext', 'some-content');
+ 
+// # If you do not have S3 as your default:
+// $contents = Storage::disk('s3')->get('path/to/file.ext');
+// Storage::disk('s3')->put('path/to/file.ext', 'some-content');
+        //          $path = Storage::disk('s3')->put('images',$file);
+        // $path = Storage::disk('s3')->url($path);
+       //$path = $request->file('uploadImage')->store('images', 's3');
+       //$path = Storage::disk('s3')->put('images',$file);
+                $newItem = array('uri'=>$name,'type'=>$type,'extension'=>$extension,'path'=>$path,'width'=>$width,'height'=>$height);
                  array_push($files,$newItem);
             }
          }
@@ -161,6 +172,7 @@ class feedsController extends Controller
         $feed = feeds::where('feedId',$request->get('feedId'))->first();
         $feed->likes = $likes;
         $feed->users = $likesUsers;
+        
         $feed->save();
 
         return response()->json(['status' => 'Success','code'=>200,'data' => $likes]);

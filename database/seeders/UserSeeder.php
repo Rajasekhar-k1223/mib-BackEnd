@@ -28,7 +28,7 @@ DB::table('users')->insert([
             // 'email' => Str::random(10).'@mibook.in',
             // 'password' => Hash::make('password'),
             'userId' => $faker->unique()->numberBetween($min = 1, $max = 50),
-            'userName' => $faker->userName,
+            'username' => $faker->userName,
             'email' => $faker->userName.'@mibook.in',
             'password' => bcrypt("Raja@1223"),
             //'create_date' => $faker->,

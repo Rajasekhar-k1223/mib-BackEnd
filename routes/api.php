@@ -17,7 +17,7 @@ use App\Http\Controllers\defaultSettingsController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::post('/UserCreate',[UsersController::class,'store']);
+Route::post('/newUser',[UsersController::class,'store']);
 Route::get('/UserCreate',[UsersController::class,'getAll']);
 //Route::get('/getUser',[UsersController::class,'getUser']);
 Route::get('/getUser/{userId}',[UsersController::class,'getUser']);
@@ -37,11 +37,15 @@ Route::middleware('auth:api')->get('/getFriendsList',[FriendsController::class,'
 Route::middleware('auth:api')->get('/getFriendDetails',[FriendsController::class,'getFriendDetails']);
 Route::get('/getAllUsers',[UsersController::class,'getAllUsers']);
 Route::middleware('auth:api')->get('/streamVideo',[feedsController::class,'stream']);
+Route::middleware('auth:api')->get('/findFriendOrPage',[FriendsController::class,'findFriendOrPage']);
+Route::middleware('auth:api')->get('/FriendRequestFromCheck',[FriendsController::class,'FriendRequestFromCheck']);
+Route::middleware('auth:api')->get('/CheckListNotification',[FriendsController::class,'CheckListNotification']);
 // Route::get('/streamVideo',[feedsController::class,'stream']);
 Route::middleware('auth:api')->post('/NewFeed',[feedsController::class,'createFeed']);
 Route::middleware('auth:api')->post('/CheckLikes',[feedsController::class,'CheckLikes']);
 Route::middleware('auth:api')->post('/CheckdisLikes',[feedsController::class,'CheckdisLikes']);
 Route::middleware('auth:api')->post('/emojismileAdd',[feedsController::class,'emojismileAdd']);
+Route::middleware('auth:api')->post('/FriendRequestFrom',[FriendsController::class,'FriendRequestFrom']);
 
 Route::post('/registration',[UsersController::class,'registration']);
 Route::post('/login',[UsersController::class,'login']);

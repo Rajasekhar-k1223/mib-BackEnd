@@ -8,7 +8,7 @@ let port = 3006; // desired port
 let host = "0.0.0.0"; // desired host; 0.0.0.0 to host on your ip
 const io = require("socket.io")(server, {
     cors: {
-        origin: "http://localhost:3001",
+        origin: "http://localhost:3000",
         methods: ["GET", "POST"],
     },
 });
@@ -18,7 +18,7 @@ io.on("connection", (socket) => {
     console.log("connection");
     // const userList = [];
     axios
-        .get("http://192.168.10.60:8000/api/getAllUsers")
+        .get("http://127.0.0.1:8000/api/getAllUsers")
         .then((response) => {
             // userList.push(response.data.data.userId);
             console.log("users");
@@ -44,10 +44,44 @@ io.on("connection", (socket) => {
         cb(message[roomName]);
     });
     socket.on("sendChatToServer", (message) => {
-        console.log(message);
-        //io.sockets.emit('sendChatToClient',message);
-        console.log(socket.id);
-        socket.broadcast.emit("sendChatToClient", message);
+        //   console.log(message);
+        //i
+        const newMess = {
+            message: message.message,
+            from: message.from,
+            to: message.to,
+        };
+        console.log("check url");
+        console.log(newMess);
+        axios
+            .post("http://127.0.0.1:8000/api/SendMessageToFriend", newMess, {
+                headers: {
+                    Authorization: "Bearer " + message.token,
+                },
+            })
+            .then((response) => {
+                // userList.push(response.data.data.userId);
+                //   console.log("users");
+                // userList.push(response.data.data);
+                //console.log(response.data.data);
+                let newMessage = {
+                    connectId: socket.id,
+                    message: message,
+                };
+                console.log(socket.id);
+                io.emit("sendChatToClient", newMessage);
+                //  console.log(response.data.data);
+                //  socket.emit("LoginUserList", response.data.data);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+
+        // o.sockets.emit("sendChatToClient", message);
+        // let message = {
+        //     connectId: socket.id,
+        //     message: message,
+        // };
     });
     // socket.emit("RequestUser", socket.id);
     socket.on("callUser", (data) => {

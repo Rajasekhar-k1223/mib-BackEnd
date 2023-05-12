@@ -54,13 +54,30 @@ if(Auth::attempt([
         return $UserDate;
     }
     public function store(Request $request){
-        request()->validate(['userName'=>'required','email'=>'required|email','password'=>'required']);
+      //  request()->validate(['userName'=>'required','email'=>'required|email','password'=>'required']);
         //print_r($request->all());exit();
          //Users:create($request->all());
+        $id= (User::orderBy('userId', 'desc')->first()->userId)+1;
         $user=new User();
-        $user->UserName = $request->get('userName');
-        $user->email = $request->get('email');
-        $user->password = $request->get('password');        
+        $user->userId = $id;
+        $user->userName = $request->get('username');
+        $user->email = $request->get('username').'@mibook.in';
+        $user->password = bcrypt($request->get('password'));  
+        $user->firstname =  $request->get('firstname');
+        $user->lastname =  $request->get('lastname');
+        $user->dateofbirth =  $request->get('dateofbirth');
+        $user->gender =  $request->get('gender');
+        $user->mobile =  $request->get('mobile');
+        $user->font = ['family'=>'DancingScript','style'=>'normal','weight'=>500,'size'=>12];
+        $user->header=[
+                'color'=>"red",
+                'iconColor'=>"white",
+                'position'=>'top'
+        ];
+            $user->is_login=false;
+            $user->ip_login=$id;
+            // $user->CreatedAt = $faker->dateTimeThisMonth()->format('Y-m-d H:i:s'),
+            // 'UpdatedAt' => $faker->dateTimeThisMonth()->format('Y-m-d H:i:s'),     
         $user->save();
          return true;
     }

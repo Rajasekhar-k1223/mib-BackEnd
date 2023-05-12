@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\FriendsModel;
 use App\Models\User;
 use App\Models\messages;
+use App\Models\FriendRequest;
 use Illuminate\Http\Request;
 
 class FriendsController extends Controller
@@ -21,7 +22,14 @@ $message = $merge->values()->all();
     }
     public function SendMessageToFriend(Request $request){
        // $messageId = messages::find() -> sort(array('messageId' => -1)) -> limit(1); 
-      $messageId= messages::orderBy('messageId', 'desc')->first()->messageId;
+      $messageId= messages::orderBy('messageId', 'desc')->first();
+      $msg = $messageId ? 1:0;
+      if($msg ==1){
+        $messageId = messages::orderBy('messageId', 'desc')->first()->messageId;
+      }else{
+        $messageId=0;
+      }
+      //return $messageId;
         $from = $request->get("from");
         $to = $request->get("to");
         $message = $request->get("message");
@@ -36,7 +44,7 @@ $message = $merge->values()->all();
 }
         public function getFriendsList(Request $request)
         {
-        $message1 = User::where("userId",(int)$request->from)->get();
+        $message1 = User::where("userId",(int)$request->from)->get(["friends_list"]);
         return response()->json(['status' => 'Success','code'=>200,'data' => $message1]);
         }
         public function getFriendDetails(Request $request)
@@ -44,4 +52,27 @@ $message = $merge->values()->all();
         $message1 = User::where("userId",(int)$request->from)->get();
         return response()->json(['status' => 'Success','code'=>200,'data' => $message1]);
         }
+        public function findFriendOrPage(Request $request){
+                 $message1 = User::where('email', 'like', '%'.$request->searchName.'%')->orwhere('userName', 'like', '%'.$request->searchName.'%')->get();
+        return response()->json(['status' => 'Success','code'=>200,'data' => $message1]);
+        }
+        public function FriendRequestFrom(Request $request){
+                 //$message1 = User::where('email', 'like', '%'.$request->searchName.'%')->orwhere('userName', 'like', '%'.$request->searchName.'%')->get();
+                  $FriendRequest= new FriendRequest();
+                  $FriendRequest->from = $request->get("from");
+        $FriendRequest->to = $request->get("to");
+        $FriendRequest->status = $request->get("status");
+        $FriendRequest->save();
+        return response()->json(['status' => 'Success','code'=>200,'data' => $FriendRequest]);
+        }
+        public function FriendRequestFromCheck(Request $request){
+                 $message1 = FriendRequest::where("from",(int)$request->from)->where("to",(int)$request->to)->get();
+        return response()->json(['status' => 'Success','code'=>200,'data' => $message1]);
+        }
+        public function CheckListNotification(Request $request){
+                 $message1 = FriendRequest::where("to",(int)$request->from)->where("status","!=",$request->status)->get();
+        return response()->json(['status' => 'Success','code'=>200,'data' => $message1]);
+        }
+       
+                
 }
