@@ -17,7 +17,7 @@ class FriendsController extends Controller
         //$message = sort(array_merge($message1->toArray(),$message2->toArray()));
         $merge = $message1->merge($message2)->sortBy('created_at');
        //$merge = collect(array_merge($message1,$message2))->sortBy('created_at');
-$message = $merge->values()->all();
+        $message = $merge->values()->all();
         return response()->json(['status' => 'Success','code'=>200,'data' => $message]);
     }
     public function SendMessageToFriend(Request $request){
@@ -35,9 +35,10 @@ $message = $merge->values()->all();
         $message = $request->get("message");
         $SendMesssge = new messages();
         $SendMesssge->messageId= $messageId+1;
-        $SendMesssge->from = $from;
-        $SendMesssge->to = $to;
+        $SendMesssge->from = (int)$from;
+        $SendMesssge->to = (int)$to;
         $SendMesssge->message = $message;
+        // $SendMesssge->created_at = new DateTime();
         $SendMesssge->save();
        // $success = event(new App\Events\NewMessage($SendMesssge));
         return response()->json(['status' => 'Success','code'=>200,'data' => $SendMesssge]);
@@ -72,6 +73,18 @@ $message = $merge->values()->all();
         public function CheckListNotification(Request $request){
                  $message1 = FriendRequest::where("to",(int)$request->from)->where("status","!=",$request->status)->get();
         return response()->json(['status' => 'Success','code'=>200,'data' => $message1]);
+        }
+        public function friendRequestAcceptance(Request $request){
+          $updateRequest  = FriendRequest::where('to',(int)$request->from)->where('from',(int)$request->to)->update(["status"=>$request->status]);
+          $fromID = User::select("userId","userName")->where('userId',(int)$request->to)->get()->toarray();
+          $toID = User::select("userId","userName")->where('userId',(int)$request->from)->get()->toarray();
+          // $data = array("2"=>array("name":"nikhil"));
+          $requestingfrom = User::where('userId',(int)$request->to);//return mongo data
+          $requestingfrom->push('friends_list',$fromID);
+          $requestingto = User::where('userId',(int)$request->from);//return mongo data
+          $requestingto->push('friends_list',$toID);
+
+          return response()->json(['status' => 'Success','code'=>200,'data' => $updateRequest]);
         }
        
                 

@@ -9,30 +9,30 @@ class UsersController extends Controller
 {
     public function registration(Request $request)
     {
-$allData = $request->all();
-$allData['password']=bcrypt($allData['password']);
-$user = User::create($allData);
-$resArr = [];
-$resArr['token']= $user->createToken('api-application')->accessToken;
-$resArr['name']= $user->userName;
-return response()->json($resArr,200);
-    }
-    public function login(Request $request){
-if(Auth::attempt([
-    'email'=>$request->email,
-    'password'=>$request->password
-])){
-    $user = Auth::user();
-    $resArr = [];
-    $resArr['token']= $user->createToken('api-application')->accessToken;
-    $resArr['name']= $user->userName;
-    $resArr['userId']= $user->userId;
-    $resArr['headers']= $user->header;
-    return response()->json($resArr,200);
-    //return $resArr;
-}else{
-    return response()->json(['error'=>'Unauthorized Access'],203);
-}
+        $allData = $request->all();
+        $allData['password']=bcrypt($allData['password']);
+        $user = User::create($allData);
+        $resArr = [];
+        $resArr['token']= $user->createToken('api-application')->accessToken;
+        $resArr['name']= $user->userName;
+        return response()->json($resArr,200);
+            }
+            public function login(Request $request){
+        if(Auth::attempt([
+            'email'=>$request->email,
+            'password'=>$request->password
+        ])){
+            $user = Auth::user();
+            $resArr = [];
+            $resArr['token']= $user->createToken('api-application')->accessToken;
+            $resArr['userName']= $user->userName;
+            $resArr['userId']= $user->userId;
+            $resArr['headers']= $user->header;
+            return response()->json($resArr,200);
+            //return $resArr;
+        }else{
+            return response()->json(['error'=>'Unauthorized Access'],203);
+        }
     }
     //
     public function logout(Request $request){
@@ -65,8 +65,8 @@ if(Auth::attempt([
         $user->password = bcrypt($request->get('password'));  
         $user->firstname =  $request->get('firstname');
         $user->lastname =  $request->get('lastname');
-        $user->dateofbirth =  $request->get('dateofbirth');
-        $user->gender =  $request->get('gender');
+        $user->DOB =  $request->get('dateofbirth');
+        $user->G =  $request->get('gender');
         $user->mobile =  $request->get('mobile');
         $user->font = ['family'=>'DancingScript','style'=>'normal','weight'=>500,'size'=>12];
         $user->header=[
@@ -74,8 +74,8 @@ if(Auth::attempt([
                 'iconColor'=>"white",
                 'position'=>'top'
         ];
-            $user->is_login=false;
-            $user->ip_login=$id;
+        $user->is_login=false;
+        $user->ip_login=$id;
             // $user->CreatedAt = $faker->dateTimeThisMonth()->format('Y-m-d H:i:s'),
             // 'UpdatedAt' => $faker->dateTimeThisMonth()->format('Y-m-d H:i:s'),     
         $user->save();

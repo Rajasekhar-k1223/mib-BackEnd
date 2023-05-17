@@ -69,6 +69,8 @@ class feedsController extends Controller
         $file->postType=false;
         $file->Share=false;
         $file->users = [];
+        $file->CreatedAt = new Date();
+        $file->UpdatedAt = new Date();
         $file->email=$request->get('email');
         $file->is_login =false;
         $file->ipconfig=$request->get('ipaddress');

@@ -64,10 +64,12 @@ io.on("connection", (socket) => {
                 //   console.log("users");
                 // userList.push(response.data.data);
                 //console.log(response.data.data);
+                //  console.log(response);
                 let newMessage = {
                     connectId: socket.id,
-                    message: message,
+                    message: response.data,
                 };
+                console.log(newMessage);
                 console.log(socket.id);
                 io.emit("sendChatToClient", newMessage);
                 //  console.log(response.data.data);

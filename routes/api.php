@@ -39,6 +39,7 @@ Route::get('/getAllUsers',[UsersController::class,'getAllUsers']);
 Route::middleware('auth:api')->get('/streamVideo',[feedsController::class,'stream']);
 Route::middleware('auth:api')->get('/findFriendOrPage',[FriendsController::class,'findFriendOrPage']);
 Route::middleware('auth:api')->get('/FriendRequestFromCheck',[FriendsController::class,'FriendRequestFromCheck']);
+Route::middleware('auth:api')->get('/friendRequestAcceptance',[FriendsController::class,'friendRequestAcceptance']);
 Route::middleware('auth:api')->get('/CheckListNotification',[FriendsController::class,'CheckListNotification']);
 // Route::get('/streamVideo',[feedsController::class,'stream']);
 Route::middleware('auth:api')->post('/NewFeed',[feedsController::class,'createFeed']);
