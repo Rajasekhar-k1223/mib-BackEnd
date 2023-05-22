@@ -2,9 +2,8 @@
 
 namespace Laravel\Passport;
 
-// use Illuminate\Database\Eloquent\Model;
+//use Illuminate\Database\Eloquent\Model;
 use Jenssegers\Mongodb\Eloquent\Model;
-
 class Token extends Model
 {
     /**

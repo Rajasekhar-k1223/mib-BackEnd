@@ -13,24 +13,63 @@ const io = require("socket.io")(server, {
     },
 });
 const axios = require("axios");
+let onlineUsers = [];
 
+const addNewUser = (username, socketId) => {
+  !onlineUsers.some((user) => user.username === username) &&
+    onlineUsers.push({ username, socketId });
+};
+
+const removeUser = (socketId) => {
+  onlineUsers = onlineUsers.filter((user) => user.socketId !== socketId);
+};
+
+const getUser = (username) => {
+  return onlineUsers.find((user) => user.username === username);
+};
 io.on("connection", (socket) => {
+    socket.on("newUser", (username) => {
+        addNewUser(username, socket.id);
+      });
     console.log("connection");
     // const userList = [];
-    axios
-        .get("http://127.0.0.1:8000/api/getAllUsers")
-        .then((response) => {
-            // userList.push(response.data.data.userId);
-            console.log("users");
-            // userList.push(response.data.data);
-            //console.log(response.data.data);
-            console.log(response.data.data);
-            socket.emit("LoginUserList", response.data.data);
-        })
-        .catch((error) => {
-            console.log(error);
-        });
+    // axios
+    //     .get("http://127.0.0.1:8000/api/getAllUsers")
+    //     .then((response) => {
+    //         // userList.push(response.data.data.userId);
+    //         console.log("users");
+    //         // userList.push(response.data.data);
+    //         //console.log(response.data.data);
+    //         console.log(response.data.data);
+    //         socket.emit("LoginUserList", response.data.data);
+    //     })
+    //     .catch((error) => {
+    //         console.log(error);
+    //     });
     // console.log(userList);
+    socket.on("newUser", (username) => {
+        addNewUser(username, socket.id);
+      });
+    
+      socket.on("sendNotification", ({ senderName, receiverName, type }) => {
+        const receiver = getUser(receiverName);
+        io.to(receiver.socketId).emit("getNotification", {
+          senderName,
+          type,
+        });
+      });
+    
+      socket.on("sendText", ({ senderName, receiverName, text }) => {
+        const receiver = getUser(receiverName);
+        io.to(receiver.socketId).emit("getText", {
+          senderName,
+          text,
+        });
+      });
+    
+      socket.on("disconnect", () => {
+        removeUser(socket.id);
+      });
     socket.on("JoinServer", (userName) => {
         const user = {
             userName,
@@ -98,9 +137,9 @@ io.on("connection", (socket) => {
         io.to(data.to).emit("callAccepted", data.signal);
     });
 
-    socket.on("disconnect", () => {
-        console.log("Disconnect");
-    });
+    // socket.on("disconnect", () => {
+    //     console.log("Disconnect");
+    // });
 });
 
 server.listen(port, allowedHost, () => {
