@@ -25,7 +25,8 @@ const removeUser = (socketId) => {
 };
 
 const getUser = (username) => {
-    return onlineUsers.find((user) => user.username === username);
+  //console.log(username)
+    return onlineUsers.find((user) => parseInt(user.username) === parseInt(username));
 };
 io.on("connection", (socket) => {
     // socket.on("newUser", (username) => {
@@ -53,12 +54,12 @@ io.on("connection", (socket) => {
     });
 
     socket.on("sendNotification", ({ senderName, receiverName, type }) => {
-        const receiver = getUser(receiverName);
-        console.log(receiver);
-        // io.to(receiver.socketId).emit("getNotification", {
-        //     senderName,
-        //     type,
-        // });
+      console.log(receiverName)  
+      const receiver = getUser(receiverName);
+        io.to(receiver.socketId).emit("getNotification", {
+            senderName,
+            type,
+        });
     });
 
     socket.on("sendText", ({ senderName, receiverName, text }) => {
