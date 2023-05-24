@@ -16,6 +16,7 @@ const axios = require("axios");
 let onlineUsers = [];
 
 const addNewUser = (username, socketId) => {
+    console.log(`New message from ${socketId}: ${username}`);
     !onlineUsers.some((user) => user.username === username) &&
         onlineUsers.push({ username, socketId });
 };
@@ -31,6 +32,9 @@ const getUser = (username) => {
     );
 };
 io.on("connection", (socket) => {
+    // console.log("login");
+    // console.log(socket);
+    // console.log(socket.id);
     // socket.on("newUser", (username) => {
     //     addNewUser(username, socket.id);
     //   });
@@ -51,6 +55,8 @@ io.on("connection", (socket) => {
     //     });
     // console.log(userList);
     socket.on("newUser", (username) => {
+        //  console.log(socket);
+        console.log(`New message from ${socket.id}: ${username}`);
         addNewUser(username, socket.id);
         console.log(onlineUsers);
     });
@@ -58,9 +64,12 @@ io.on("connection", (socket) => {
     socket.on("sendNotification", ({ senderName, receiverName, type }) => {
         console.log(receiverName);
         const receiver = getUser(receiverName);
-        console.log(receiver.socketId);
+        // console.log(receiver.socketId);
+        //.socket.to(receiver.socketId)
+        console.log(`New message from ${socket.id}: ${receiver.socketId}`);
         io.to(receiver.socketId).emit("getNotification", {
             senderName,
+            receiverName,
             type,
         });
     });
@@ -147,7 +156,6 @@ io.on("connection", (socket) => {
     //     console.log("Disconnect");
     // });
 });
-
 server.listen(port, allowedHost, () => {
     console.log(`The server is running on http://${allowedHost}:${port}`);
 });
