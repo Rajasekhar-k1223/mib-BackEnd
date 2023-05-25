@@ -16,7 +16,7 @@ const axios = require("axios");
 let onlineUsers = [];
 
 const addNewUser = (username, socketId) => {
-    console.log(`New message from ${socketId}: ${username}`);
+    // console.log(`New message from ${socketId}: ${username}`);
     !onlineUsers.some((user) => user.username === username) &&
         onlineUsers.push({ username, socketId });
 };
@@ -56,22 +56,31 @@ io.on("connection", (socket) => {
     // console.log(userList);
     socket.on("newUser", (username) => {
         //  console.log(socket);
-        console.log(`New message from ${socket.id}: ${username}`);
+        // console.log(`New message from ${socket.id}: ${username}`);
         addNewUser(username, socket.id);
         console.log(onlineUsers);
     });
 
-    socket.on("sendNotification", ({ senderName, receiverName, type }) => {
-        console.log(receiverName);
-        const receiver = getUser(receiverName);
-        // console.log(receiver.socketId);
+    socket.on("sendNotification", ({ senderID,senderName, receiverID, type }) => {
+        // console.log(senderName);
+        const receiver = getUser(receiverID);
+        // console.log(onlineUsers)
+        // //const receivers = getUser(receiverName);
+        // console.log(receiver);
         //.socket.to(receiver.socketId)
-        console.log(`New message from ${socket.id}: ${receiver.socketId}`);
+        // console.log(`New message from ${socket.id}: ${receiver.socketId}`);
+        // console.log("socketConnect")
+        // console.log(receiver);
+        if(receiver){
         io.to(receiver.socketId).emit("getNotification", {
             senderName,
-            receiverName,
+            receiverID,
             type,
         });
+    }else{
+        console.log(onlineUsers)
+        console.log(receiver)
+    }
     });
 
     socket.on("sendText", ({ senderName, receiverName, text }) => {
