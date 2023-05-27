@@ -71,8 +71,22 @@ class FriendsController extends Controller
         return response()->json(['status' => 'Success','code'=>200,'data' => $message1]);
         }
         public function CheckListNotification(Request $request){
-                 $message1 = FriendRequest::where("to",(int)$request->from)->where("status","!=",$request->status)->get();
-        return response()->json(['status' => 'Success','code'=>200,'data' => $message1]);
+                 $message1 = FriendRequest::where("to",(int)$request->from)->where("status","!=",$request->status)->get()->toarray();
+               // return $message1;
+               $allNotiList = [];
+               foreach($message1 as $msg){
+                $frdDe = User::select("userId","userName","profile_pic")->where('userId',(int)$msg['from'])->get();
+                $allNotiList[] = $frdDe;
+               }
+//               $output = array_map(function($element) {
+//     return (object) $element;
+// }, $allNotiList);
+              //  $arrayOfObjects = $allNotiList.map(function(item){return { item}});
+               //return $message1;
+//                $arrayOfObjects = array_map(function ($array) {
+//     return json_decode(json_encode($array), false);
+// }, $allNotiList);
+        return response()->json(['status' => 'Success','code'=>200,'data' => $allNotiList]);
         }
         public function friendRequestAcceptance(Request $request){
           $updateRequest  = FriendRequest::where('to',(int)$request->from)->where('from',(int)$request->to)->update(["status"=>$request->status]);
