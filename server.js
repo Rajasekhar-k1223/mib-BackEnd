@@ -77,27 +77,28 @@ io.on("connection", (socket) => {
             }
         }
     );
-    socket.on("AcceptFriendRequest", (AuthDetails) => {
-        const newMess = {
+    socket.on("AcceptFriendRequest", async (AuthDetails) => {
+        let data = JSON.stringify({
             from: AuthDetails.from,
-            fromName: AuthDetails.fromName,
             to: AuthDetails.to,
-            toName: AuthDetails.toName,
             status: "Accept",
+        });
+        let config = {
+            method: "get",
+            maxBodyLength: Infinity,
+            url: "http://127.0.0.1:8000/api/friendRequestAcceptance",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + AuthDetails.token,
+            },
+            data: data,
         };
 
         axios
-            .post(
-                "http://127.0.0.1:8000/api/friendRequestAcceptance",
-                newMess,
-                {
-                    headers: {
-                        Authorization: "Bearer " + AuthDetails.token,
-                    },
-                }
-            )
+            .request(config)
             .then((response) => {
-                console.log(response);
+                console.log(JSON.stringify(response.data));
+                console.log(response.data);
                 const receiver = getUser(AuthDetails.from);
                 if (receiver) {
                     const senderName = AuthDetails.fromName;
@@ -122,7 +123,43 @@ io.on("connection", (socket) => {
                     console.log(onlineUsers);
                     console.log(receiver);
                 }
+            })
+            .catch((error) => {
+                console.log(error);
             });
+
+        // const res = await axios
+        //     .get("http://127.0.0.1:8000/api/friendRequestAcceptance", config)
+        //     .then((response) => {
+        //         console.log(response.data);
+        // const receiver = getUser(AuthDetails.from);
+        // if (receiver) {
+        //     const senderName = AuthDetails.fromName;
+        //     const type = "Accept Your Request";
+        //     io.to(receiver.socketId).emit("getNotificationAcceptfrom", {
+        //         senderName,
+        //         type,
+        //     });
+        // } else {
+        //     console.log(onlineUsers);
+        //     console.log(receiver);
+        // }
+        // const sender = getUser(AuthDetails.to);
+        // if (sender) {
+        //     const type = "Now both are connected";
+        //     const senderName = AuthDetails.toName;
+        //     io.to(sender.socketId).emit("getNotificationAcceptto", {
+        //         senderName,
+        //         type,
+        //     });
+        // } else {
+        //     console.log(onlineUsers);
+        //     console.log(receiver);
+        // }
+        // })
+        // .catch((e) => {
+        //     console.log(e);
+        // });
     });
 
     socket.on("sendText", ({ senderName, receiverName, text }) => {

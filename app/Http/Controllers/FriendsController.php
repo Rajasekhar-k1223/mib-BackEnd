@@ -94,9 +94,9 @@ class FriendsController extends Controller
           $toID = User::select("userId","userName")->where('userId',(int)$request->from)->get()->toarray();
           // $data = array("2"=>array("name":"nikhil"));
           $requestingfrom = User::where('userId',(int)$request->to);//return mongo data
-          $requestingfrom->push('friends_list',$fromID);
+          $requestingfrom->push('friends_list',$toID);
           $requestingto = User::where('userId',(int)$request->from);//return mongo data
-          $requestingto->push('friends_list',$toID);
+          $requestingto->push('friends_list',$fromID);
 
           return response()->json(['status' => 'Success','code'=>200,'data' => $updateRequest]);
         }
