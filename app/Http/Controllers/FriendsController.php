@@ -5,6 +5,7 @@ use App\Models\FriendsModel;
 use App\Models\User;
 use App\Models\messages;
 use App\Models\FriendRequest;
+use App\Models\notifications;
 use Illuminate\Http\Request;
 
 class FriendsController extends Controller
@@ -97,7 +98,12 @@ class FriendsController extends Controller
           $requestingfrom->push('friends_list',$toID);
           $requestingto = User::where('userId',(int)$request->from);//return mongo data
           $requestingto->push('friends_list',$fromID);
-
+          $newNotifi = new notifications();
+          $newNotifi->messageId= $messageId+1;
+          $newNotifi->from = (int)$request->from;
+          $newNotifi->to = (int)$request->to;
+          $newNotifi->message = $request->status;
+          $newNotifi->save();
           return response()->json(['status' => 'Success','code'=>200,'data' => $updateRequest]);
         }
        

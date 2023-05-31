@@ -100,9 +100,10 @@ io.on("connection", (socket) => {
                 console.log(JSON.stringify(response.data));
                 console.log(response.data);
                 const receiver = getUser(AuthDetails.from);
+                const sender = getUser(AuthDetails.to);
                 if (receiver) {
-                    const senderName = AuthDetails.fromName;
-                    const type = "Accept Your Request";
+                    const senderName = AuthDetails.toName;
+                    const type = "Now both are connected";
                     io.to(receiver.socketId).emit("getNotificationAcceptfrom", {
                         senderName,
                         type,
@@ -111,10 +112,10 @@ io.on("connection", (socket) => {
                     console.log(onlineUsers);
                     console.log(receiver);
                 }
-                const sender = getUser(AuthDetails.to);
+                
                 if (sender) {
-                    const type = "Now both are connected";
-                    const senderName = AuthDetails.toName;
+                    const type = "Accept Your Request";
+                    const senderName = AuthDetails.fromName;
                     io.to(sender.socketId).emit("getNotificationAcceptto", {
                         senderName,
                         type,
