@@ -54,6 +54,54 @@ io.on("connection", (socket) => {
     //         console.log(error);
     //     });
     // console.log(userList);
+    socket.on("FrdsonLine", ({ loginId, userList }) => {
+        const checkonline = userList.map((userItem) => {
+            const userOn = getUser(userItem.userId);
+            console.log(userOn);
+            if (userOn != undefined) {
+                if (parseInt(userOn.username) === parseInt(userItem.userId)) {
+                    let userLeton = {
+                        userId: parseInt(userOn.username),
+                        userOn: true,
+                    };
+                    return userLeton;
+                } else {
+                    let userLeton = {
+                        userId: parseInt(userOn.username),
+                        userOn: false,
+                    };
+                    return userLeton;
+                }
+            } else {
+                let userLeton = {
+                    userId: userItem.userId,
+                    userOn: false,
+                };
+                return userLeton;
+            }
+        });
+        // const checkonline = onlineUsers.map((user) => {
+        //     var useron = [];
+        //     // console.log(onlineUsers);
+        //     // console.log(user);
+        //     // console.log(userList[0].userId);
+        //     // console.log(parseInt(user.username));
+        //     if (userList[0].userId === parseInt(user.username)) {
+        //         let userLeton = {
+        //             userId: parseInt(user.username),
+        //             userOn: true,
+        //         };
+        //         return userLeton;
+        //     }
+        // });
+        console.log("frds online");
+        console.log(checkonline);
+        console.log(onlineUsers);
+        const receiver = getUser(loginId);
+        receiver !== undefined
+            ? io.to(receiver.socketId).emit("getOnlinefrds", checkonline)
+            : null;
+    });
     socket.on("newUser", (username) => {
         //  console.log(socket);
         // console.log(`New message from ${socket.id}: ${username}`);
@@ -112,7 +160,7 @@ io.on("connection", (socket) => {
                     console.log(onlineUsers);
                     console.log(receiver);
                 }
-                
+
                 if (sender) {
                     const type = "Accept Your Request";
                     const senderName = AuthDetails.fromName;

@@ -72,11 +72,19 @@ class FriendsController extends Controller
         return response()->json(['status' => 'Success','code'=>200,'data' => $message1]);
         }
         public function CheckListNotification(Request $request){
-                 $message1 = FriendRequest::where("to",(int)$request->from)->where("status","!=",$request->status)->get()->toarray();
+                 //$message1 = FriendRequest::where("to",(int)$request->from)->where("status","!=",$request->status)->get()->toarray();
+                 $message1 = FriendRequest::where("to",(int)$request->from)->orderByDesc('created_at')->get()->toarray();
                // return $message1;
                $allNotiList = [];
                foreach($message1 as $msg){
-                $frdDe = User::select("userId","userName","profile_pic")->where('userId',(int)$msg['from'])->get();
+                $frdDe = new User();
+                $frdDeUser = User::select("userId","userName","profile_pic")->where('userId',(int)$msg['from'])->get();
+                $frdDe->userId = $frdDeUser[0]["userId"];
+                $frdDe->userName = $frdDeUser[0]["userName"];
+                $frdDe->profile_pic = $frdDeUser[0]["profile_pic"];
+                $frdDe->status = $msg['status'];
+                //array_push($frdDe["status"], $msg['status']);
+                //array_push($frdDe,['status' => $msg['status']]);
                 $allNotiList[] = $frdDe;
                }
 //               $output = array_map(function($element) {
@@ -89,22 +97,48 @@ class FriendsController extends Controller
 // }, $allNotiList);
         return response()->json(['status' => 'Success','code'=>200,'data' => $allNotiList]);
         }
+           public function CheckLisFriends(Request $request){
+                 //$message1 = FriendRequest::where("to",(int)$request->from)->where("status","!=",$request->status)->get()->toarray();
+                 $message1 = FriendRequest::where("to",(int)$request->from)->orderByDesc('created_at')->get()->toarray();
+               // return $message1;
+               $allNotiList = [];
+               foreach($message1 as $msg){
+                $frdDe = new User();
+                $frdDeUser = User::select("userId","userName","profile_pic")->where('userId',(int)$msg['from'])->get();
+                $frdDe->userId = $frdDeUser[0]["userId"];
+                $frdDe->userName = $frdDeUser[0]["userName"];
+                $frdDe->profile_pic = $frdDeUser[0]["profile_pic"];
+                $frdDe->status = $msg['status'];
+                $allNotiList[] = $frdDe;
+               }             
+        return response()->json(['status' => 'Success','code'=>200,'data' => $allNotiList]);
+        }
         public function friendRequestAcceptance(Request $request){
           $updateRequest  = FriendRequest::where('to',(int)$request->from)->where('from',(int)$request->to)->update(["status"=>$request->status]);
           $fromID = User::select("userId","userName")->where('userId',(int)$request->to)->get()->toarray();
           $toID = User::select("userId","userName")->where('userId',(int)$request->from)->get()->toarray();
           // $data = array("2"=>array("name":"nikhil"));
-          $requestingfrom = User::where('userId',(int)$request->to);//return mongo data
+          $requestingfromChecking = User::where('friends_list.userId',(int)$request->to)->get()->toArray();
+// return $requestingfromChecking;
+          if(count($requestingfromChecking) < 1){
+            $requestingfrom = User::where('userId',(int)$request->to);
+          //return mongo data
           $requestingfrom->push('friends_list',$toID);
           $requestingto = User::where('userId',(int)$request->from);//return mongo data
           $requestingto->push('friends_list',$fromID);
           $newNotifi = new notifications();
-          $newNotifi->messageId= $messageId+1;
-          $newNotifi->from = (int)$request->from;
-          $newNotifi->to = (int)$request->to;
-          $newNotifi->message = $request->status;
+          $newNotifi->fromId = (int)$request->from;
+          $newNotifi->toId = (int)$request->to;
+          $newNotifi->fromName = $fromID[0]["userName"];
+          $newNotifi->toName = $toID[0]["userName"];
+          $newNotifi->message = $toID[0]["userName"]." ".$request->status." your Request";
+          $newNotifi->is_seen = false;
           $newNotifi->save();
-          return response()->json(['status' => 'Success','code'=>200,'data' => $updateRequest]);
+          }else{
+            $requestingfrom = "Already Exits";
+          }
+          
+          return response()->json(['status' => 'Success','code'=>200,'data' => $requestingfrom]);
         }
        
                 
