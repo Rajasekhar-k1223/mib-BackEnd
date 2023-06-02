@@ -98,7 +98,9 @@ io.on("connection", (socket) => {
         console.log(checkonline);
         console.log(onlineUsers);
         const receiver = getUser(loginId);
-        receiver !== undefined
+        console.log("Login User");
+        console.log(receiver);
+        receiver?.socketId != undefined
             ? io.to(receiver.socketId).emit("getOnlinefrds", checkonline)
             : null;
     });
