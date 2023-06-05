@@ -94,12 +94,7 @@ io.on("connection", (socket) => {
         //         return userLeton;
         //     }
         // });
-        console.log("frds online");
-        console.log(checkonline);
-        console.log(onlineUsers);
         const receiver = getUser(loginId);
-        console.log("Login User");
-        console.log(receiver);
         receiver?.socketId != undefined
             ? io.to(receiver.socketId).emit("getOnlinefrds", checkonline)
             : null;
@@ -147,8 +142,6 @@ io.on("connection", (socket) => {
         axios
             .request(config)
             .then((response) => {
-                console.log(JSON.stringify(response.data));
-                console.log(response.data);
                 const receiver = getUser(AuthDetails.from);
                 const sender = getUser(AuthDetails.to);
                 if (receiver) {
@@ -218,6 +211,31 @@ io.on("connection", (socket) => {
         io.to(receiver.socketId).emit("getText", {
             senderName,
             text,
+        });
+    });
+    socket.on("callfromVideo", (user) => {
+        console.log(user);
+        const receiver = getUser(user.userId);
+        const type = "Calling";
+        if (receiver) {
+            io.to(receiver.socketId).emit("CallAcceptance", {
+                user,
+                type,
+            });
+        }
+    });
+    socket.on("callAccepted", (user) => {
+        const receiver = getUser(user.userId);
+        io.to(receiver.socketId).emit("callRejectedRes", {
+            user,
+            type,
+        });
+    });
+    socket.on("callRejected", (user) => {
+        const receiver = getUser(user.userId);
+        io.to(receiver.socketId).emit("callRejectedRes", {
+            user,
+            type,
         });
     });
 
