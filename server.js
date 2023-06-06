@@ -213,9 +213,10 @@ io.on("connection", (socket) => {
             text,
         });
     });
-    socket.on("callfromVideo", (user) => {
+    socket.on("callfromVideo", (user,userId) => {
         console.log(user);
         const receiver = getUser(user.userId);
+        const sender = getUser(user.userId);
         const type = "Calling";
         if (receiver) {
             io.to(receiver.socketId).emit("CallAcceptance", {
@@ -223,10 +224,19 @@ io.on("connection", (socket) => {
                 type,
             });
         }
+        if (sender) {
+            io.to(receiver.socketId).emit("CallAcceptanceSender", {
+                user,
+                type,
+            });
+        }
     });
     socket.on("callAccepted", (user) => {
+        console.log(user)
         const receiver = getUser(user.userId);
-        io.to(receiver.socketId).emit("callRejectedRes", {
+        console.log(receiver);
+        const type="call Accepted";
+        io.to(receiver.socketId).emit("callAcceptedres", {
             user,
             type,
         });
