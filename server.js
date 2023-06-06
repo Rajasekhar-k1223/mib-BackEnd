@@ -225,7 +225,7 @@ io.on("connection", (socket) => {
             });
         }
         if (sender) {
-            io.to(receiver.socketId).emit("CallAcceptanceSender", {
+            io.to(sender.socketId).emit("CallAcceptanceSender", {
                 user,
                 type,
             });
