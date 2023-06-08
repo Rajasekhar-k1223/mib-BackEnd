@@ -232,9 +232,9 @@ io.on("connection", (socket) => {
             });
         }
     });
-    socket.on("callAccepted", ({user,userId}) => {
-        console.log(user)
-        const receiver = getUser(user.userId);
+    socket.on("callAccepted", ({username,userId}) => {
+        console.log(username)
+        const receiver = getUser(username.userId);
         const sender = getUser(userId);
         console.log(receiver);
         const type="call Accepted";
