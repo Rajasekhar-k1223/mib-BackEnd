@@ -33,6 +33,38 @@ const getUser = (username) => {
     );
 };
 io.on("connection", (socket) => {
+    socket.on("room:join", (data) => {
+        const { userId, room } = data;
+        userToSocketIdMap.set(userId, socket.id);
+        socketidToUserMap.set(socket.id, userId);
+        io.to(room).emit("user:joined", { userId, id: socket.id });
+        socket.join(room);
+        io.to(socket.id).emit("room:join", data);
+      });
+    
+      socket.on("user:call", ({ to, offer }) => {
+        io.to(to).emit("incomming:call", { from: socket.id, offer });
+      });
+    
+      socket.on("call:accepted", ({ to, ans }) => {
+        io.to(to).emit("call:accepted", { from: socket.id, ans });
+      });
+    
+      socket.on("peer:nego:needed", ({ to, offer }) => {
+        console.log("peer:nego:needed", offer);
+        io.to(to).emit("peer:nego:needed", { from: socket.id, offer });
+      });
+    
+      socket.on("peer:nego:done", ({ to, ans }) => {
+        console.log("peer:nego:done", ans);
+        io.to(to).emit("peer:nego:final", { from: socket.id, ans });
+      });
+
+
+
+
+
+
     socket.emit("me", socket.id);
     // console.log("login");
     // console.log(socket);
@@ -67,7 +99,7 @@ io.on("connection", (socket) => {
         const reciver = getUser(userId);
         console.log(reciver)
         io.to(reciver.socketId).emit("calling-Request",{roomId,userId,emailId});
-        socket.broadcast.to(roomId).emit("user-joined",{emailId});
+      //  socket.broadcast.to(roomId).emit("user-joined",{emailId});
     })
     socket.on("Accept-Room",(data)=>{
         const {roomId,userId,emailId} = data;
@@ -78,15 +110,20 @@ io.on("connection", (socket) => {
         socketToEmailMapping.set(socket.id,emailId)
         socket.join(roomId);
         socket.emit("joined-room",{roomId});
-        const reciver = getUser(userId);
+        const reciver = getUser("36");
         console.log(reciver)
-        socket.broadcast.to(roomId).emit("user-joined",{emailId});
+        io.to(reciver.socketId).emit("user-joined",{emailId});
     })
-    socket.on("call-user",data=>{
+    socket.on("call-user",(data)=>{
         const {emailId,offer}= data;
+        console.log("checking user offer")
+        console.log(emailId);
+        console.log(offer)
         const fromEmail = socketToEmailMapping.get(socket.id)
         const socketId = emailToSocketMapping.get(emailId);
-        socket.to(socketId).emit("incomeing-call",{from:fromEmail,offer})
+        console.log(socketId);
+        console.log(fromEmail)
+        socket.to(socketId).emit("incoming-call",{from:fromEmail,offer})
     });
     socket.on("call-accepted",(data)=>{
         const {emailId,ans} = data;
