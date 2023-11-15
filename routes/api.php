@@ -26,6 +26,7 @@ Route::get('/getUser/{userId}',[UsersController::class,'getUser']);
 
 // Route::middleware('auth:api')->get('/feeds',[feedsController::class,'getAll']);
 Route::middleware('auth:api')->post('/feeds',[feedsController::class,'getAll']);
+Route::middleware('auth:api')->post('/feedsNonCache',[feedsController::class,'getAllFeeds']);
 Route::middleware('auth:api')->post('/changeUserHeaderColor',[UsersController::class,'changeUserHeaderColor']);
 Route::middleware('auth:api')->get('/getUser/{userId}',[UsersController::class,'getUser']);
 Route::middleware('auth:api')->get('/defaultsettings',[defaultSettingsController::class,'getSettings']);

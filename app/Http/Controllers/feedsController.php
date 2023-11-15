@@ -1,10 +1,12 @@
 <?php
-
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
 use App\Models\feeds;
 use App\Models\Likes;
+use Illuminate\Support\Str;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 //use App\Http\Controllers\VideoStream;
 use App\Http\Helpers\VideoStream;
 //use App\Models\File;
@@ -13,18 +15,35 @@ class feedsController extends Controller
 {
     //
     public function getAll(Request $request){
+        if(Cache::has('feedsData')){
+            $getFeeds= Cache::get('feedsData');
+            return response()->json(['status' => 'Success','code'=>200,'data' => $getFeeds]);
+        }else{
+            $getFeeds = Cache::remember("feedsData",600,function()use($request){
+            return feeds::offset($request->page)->limit($request->SetLimit)->orderBy('feedId','DESC')->get();
+        });
+        return response()->json(['status' => 'Success','code'=>200,'data' => $getFeeds]);
+        }
+
+         //$UserDate = feeds::offset($request->page)->limit($request->SetLimit)->orderBy('feedId','DESC')->get();
+       //  exec('D:\mibook\mib\mib-api\python_file\mail.py');
+        //return response()->json(['status' => 'Success','code'=>200,'data' => $getFeeds]);
+
+    }
+    public function getAllFeeds(Request $request){
+
          $UserDate = feeds::offset($request->page)->limit($request->SetLimit)->orderBy('feedId','DESC')->get();
        //  exec('D:\mibook\mib\mib-api\python_file\mail.py');
         return response()->json(['status' => 'Success','code'=>200,'data' => $UserDate]);
-        
+
     }
     public function createFeed(Request $request){
          $files = [];
          //print_r($request->hasfile('filenames'));
-         
+
         if($request->file('uploadImage'))
          {
-           
+
             foreach($request->file('uploadImage') as $file)
             {
                 // return $file;
@@ -33,16 +52,24 @@ class feedsController extends Controller
                 //$name = md5($file->getClientOriginalName());
                 $extension = $file->extension();
                 $type = $file->getMimeType();
+                $folder = null; $filename = null;
                 list($width, $height) = getimagesize($file);
-                $path = $file->storeAs('images',$storename,'public');
-                //$img = file_get_contents($file->move(public_path('files'), $name));  
+               // $path = $file->storeAs('images',$storename,'public');
+                $name = !is_null($filename) ? $filename : Str::random(25);
+
+                $path =  $file->storeAs(
+                    $folder,
+                    $name . "." . $file->getClientOriginalExtension(),
+                    'gcs'
+                );
+                //$img = file_get_contents($file->move(public_path('files'), $name));
                 //$data = "data:@file/" . $file->extension() . ";base64,".base64_encode($img);
                 //$data = 'data:'.$type.';base64,'.base64_encode($img);
                // $storagepath =  env('APP_URL').':8000/storage/images';
                # If you set S3 as your default:
 // $contents = Storage::get('path/to/file.ext');
 // Storage::put('path/to/file.ext', 'some-content');
- 
+
 // # If you do not have S3 as your default:
 // $contents = Storage::disk('s3')->get('path/to/file.ext');
 // Storage::disk('s3')->put('path/to/file.ext', 'some-content');
@@ -50,27 +77,29 @@ class feedsController extends Controller
         // $path = Storage::disk('s3')->url($path);
        //$path = $request->file('uploadImage')->store('images', 's3');
        //$path = Storage::disk('s3')->put('images',$file);
-                $newItem = array('uri'=>$name,'type'=>$type,'extension'=>$extension,'path'=>$path,'width'=>$width,'height'=>$height);
+                //$getPath = Storage::disk('gcs')->url($path);
+                $getPath = 'files.mibook.in/'.$path;
+                $newItem = array('uri'=>$name,'type'=>$type,'extension'=>$extension,'path'=>$getPath,'width'=>$width,'height'=>$height);
                  array_push($files,$newItem);
             }
          }
-
   $newId = feeds::orderBy('feedId', 'desc')->first()->feedId;
-  
-         $file= new feeds();
-         $file->filenames = $files;
-         $file->feedId = $newId+1;
-         $file->userId = $request->get('userId');
-         $file->description = $request->get('description');
-         $file->likes = 0;
-         $file->emojiAction = "default";
-         $file->LikeAction=false;
+
+        $file= new feeds();
+        // $file->filenames = $files;
+        $file->feedId = $newId+1;
+        $file->userId = $request->get('userId');
+        $file->description = $request->get('description');
+        $file->likes = 0;
+        $file->emojiAction = "default";
+        $file->LikeAction=false;
         $file->userName = $request->get('userName');
         $file->postType=false;
         $file->Share=false;
         $file->users = [];
-        $file->CreatedAt = new Date();
-        $file->UpdatedAt = new Date();
+        $file->uploadImage= $files;
+        // $file->CreatedAt = new Date();
+        // $file->UpdatedAt = new Date();
         $file->email=$request->get('email');
         $file->is_login =false;
         $file->ipconfig=$request->get('ipaddress');
@@ -80,21 +109,21 @@ class feedsController extends Controller
         //return $file;
       //  $name = $request->file('uploadImages');
       //  $size = count(collect($request));
-    //   $files = $request->file('uploadImages'); 
+    //   $files = $request->file('uploadImages');
     // $errors = [];
     // return $files;
-//        foreach ($files as $file) {      
- 
+//        foreach ($files as $file) {
+
 //         $extension = $file->getClientOriginalExtension();
 //  return $extension;
         // $check = in_array($extension,$allowedfileExtension);
- 
+
         // if($check) {
         //     foreach($request->fileName as $mediaFiles) {
- 
+
         //         $path = $mediaFiles->store('public/images');
         //         $name = $mediaFiles->getClientOriginalName();
-      
+
         //         //store image file into directory and db
         //         $save = new Image();
         //         $save->title = $name;
@@ -104,16 +133,16 @@ class feedsController extends Controller
         // } else {
         //     return response()->json(['invalid_file_format'], 422);
         // }
- 
+
         //return response()->json(['file_uploaded'], 200);
- 
+
     // }
-     
+
         //return $size;
          //$UserDate = feeds::offset($request->page)->limit($request->SetLimit)->get();
-         
+
         //return response()->json(['status' => 'Success','code'=>200,'data' => $UserDate]);
-        
+
     }
     public function CheckdisLikes(Request $request){
 
@@ -128,7 +157,7 @@ class feedsController extends Controller
             if($like->userID != null){
                 array_push($likesUsers,$like->userID);
             }
-           
+
         }
         //return $likesUsers;
         $userListLoad = array_diff($likesUsers, array($request->get('UserID')));
@@ -159,7 +188,7 @@ class feedsController extends Controller
             if($like->userID != null){
                 array_push($likesUsers,$like->userID);
             }
-           
+
         }
         //return $likesUsers;
         $likes = count(likes::where('feedId',$request->get('feedId'))->get());
@@ -174,13 +203,13 @@ class feedsController extends Controller
         $feed = feeds::where('feedId',$request->get('feedId'))->first();
         $feed->likes = $likes;
         $feed->users = $likesUsers;
-        
+
         $feed->save();
 
         return response()->json(['status' => 'Success','code'=>200,'data' => $likes]);
     }
     public function getAllLikes(Request $request){
-         $UserDate = likes::offset($request->page)->limit($request->SetLimit)->get();         
+         $UserDate = likes::offset($request->page)->limit($request->SetLimit)->get();
         return response()->json(['status' => 'Success','code'=>200,'data' => $UserDate]);
     }
      public function GetfeedData($feedId){
@@ -192,7 +221,7 @@ class feedsController extends Controller
     }
 //  public function stream($filename)
 public function emojismileAdd(Request $request){
-    
+
     feeds::where('feedId',(int)$request->get("feedId"))->update(["emojismileAdd"=>$request->get("emojismileAdd")]);
     return response()->json(['status' => 'Success','code'=>200]);
 }
@@ -213,5 +242,5 @@ public function emojismileAdd(Request $request){
     public function Emojiaction(){
         return "hello";
     }
-    
+
 }

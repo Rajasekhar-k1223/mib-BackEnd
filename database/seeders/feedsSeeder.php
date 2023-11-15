@@ -48,9 +48,9 @@ DB::table('feeds')->insert([
 
 
 
-            
+
         ]);
         }
-        
+
     }
 }

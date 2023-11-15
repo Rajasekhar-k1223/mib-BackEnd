@@ -21,7 +21,9 @@
         "league/flysystem-aws-s3-v3": "1.0",
         "matthewbdaly/laravel-gridfs-storage": "^1.0",
         "mts88/mongogrid": "*",
-        "rajurayhan/larastreamer": "^1.0"
+        "predis/predis": "^2.2",
+        "rajurayhan/larastreamer": "^1.0",
+        "spatie/laravel-google-cloud-storage": "*"
     },
     "require-dev": {
         "facade/ignition": "^2.5",

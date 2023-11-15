@@ -42,7 +42,7 @@ return [
          'username' => env('MONGO_DB_USERNAME',''),
          'password' => env('MONGO_DB_PASSWORD',''),
          'options'  => []
-     ], 
+     ],
 // 'mongodb' => [
 //         'driver' => 'mongodb',
 //         'dsn' => env('DB_URI', 'mongodb+srv://elsea:jYtfuNjlWJ3pmUN7@cluster0.tfmm5.mongodb.net/Mibook?retryWrites=true&w=majority'),
@@ -148,11 +148,11 @@ return [
         ],
 
         'cache' => [
-            'url' => env('REDIS_URL'),
-            'host' => env('REDIS_HOST', '127.0.0.1'),
-            'password' => env('REDIS_PASSWORD', null),
+            'url' => env('tcp://34.66.79.52:6379'),
+            'host' => env('REDIS_HOST', '34.66.79.52'),
+            'password' => env('REDIS_PASSWORD', 'glXLxfs/WLtVRcwEETVG+k3RKTaqafA3+M3zo7L0JluraApVnMmMhf791wRElB1zMAqHWL0hbfeyJlaZ'),
             'port' => env('REDIS_PORT', '6379'),
-            'database' => env('REDIS_CACHE_DB', '1'),
+            'database' => env('REDIS_CACHE_DB', 0),
         ],
 
     ],

@@ -17,7 +17,7 @@ class UsersController extends Controller
         $resArr['name']= $user->userName;
         return response()->json($resArr,200);
             }
-            public function login(Request $request){
+        public function login(Request $request){
         if(Auth::attempt([
             'email'=>$request->email,
             'password'=>$request->password
@@ -28,6 +28,7 @@ class UsersController extends Controller
             $resArr['userName']= $user->userName;
             $resArr['userId']= $user->userId;
             $resArr['headers']= $user->header;
+            $resArr['mibemail']= $user->email;
             return response()->json($resArr,200);
             //return $resArr;
         }else{
@@ -44,7 +45,7 @@ class UsersController extends Controller
     public function getAll(){
          $UserDate = User::offset(1)->limit('100')->get();
         return response()->json(['status' => 'Success','code'=>200,'data' => $UserDate]);
-        
+
     }
     public function getUser($userId){
         //return $userId;
@@ -62,7 +63,7 @@ class UsersController extends Controller
         $user->userId = $id;
         $user->userName = $request->get('username');
         $user->email = $request->get('username').'@mibook.in';
-        $user->password = bcrypt($request->get('password'));  
+        $user->password = bcrypt($request->get('password'));
         $user->firstname =  $request->get('firstname');
         $user->lastname =  $request->get('lastname');
         $user->DOB =  $request->get('dateofbirth');
@@ -77,7 +78,7 @@ class UsersController extends Controller
         $user->is_login=false;
         $user->ip_login=$id;
             // $user->CreatedAt = $faker->dateTimeThisMonth()->format('Y-m-d H:i:s'),
-            // 'UpdatedAt' => $faker->dateTimeThisMonth()->format('Y-m-d H:i:s'),     
+            // 'UpdatedAt' => $faker->dateTimeThisMonth()->format('Y-m-d H:i:s'),
         $user->save();
          return true;
     }

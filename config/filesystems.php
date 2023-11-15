@@ -13,8 +13,8 @@ return [
     |
     */
 
-    'default' => env('FILESYSTEM_DRIVER', 'public'),
-  'cloud' => env('FILESYSTEM_CLOUD', 's3'),
+    'default' => env('FILESYSTEM_DRIVER', 'gcs'),
+  'cloud' => env('FILESYSTEM_CLOUD', 'gcs'),
     /*
     |--------------------------------------------------------------------------
     | Filesystem Disks
@@ -41,6 +41,20 @@ return [
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
         ],
+        'gcs' => [
+            'driver' => 'gcs',
+            'key_file_path' => env('GOOGLE_CLOUD_KEY_FILE', base_path('/resolute-winter-386312-6faaf7411e02.json')), // optional: /path/to/service-account.json
+            'key_file' => [], // optional: Array of data that substitutes the .json file (see below)
+            'project_id' => env('GOOGLE_CLOUD_PROJECT_ID', 'resolute-winter-386312'), // optional: is included in key file
+            'bucket' => env('GOOGLE_CLOUD_STORAGE_BUCKET', 'files.mibook.in'),
+            'path_prefix' => env('GOOGLE_CLOUD_STORAGE_PATH_PREFIX', ''), // optional: /default/path/to/apply/in/bucket
+            'storage_api_uri' => env('GOOGLE_CLOUD_STORAGE_API_URI', null), // see: Public URLs below
+            'apiEndpoint' => env('GOOGLE_CLOUD_STORAGE_API_ENDPOINT', null), // set storageClient apiEndpoint
+            'visibility' => 'public', // optional: public|private
+            'visibility_handler' => null, // optional: set to \League\Flysystem\GoogleCloudStorage\UniformBucketLevelAccessVisibility::class to enable uniform bucket level access
+            'metadata' => ['cacheControl'=> 'public,max-age=86400'], // optional: default metadata
+        ],
+
 
         's3' => [
             'driver' => 's3',
